@@ -1,0 +1,9 @@
+ci:
+- changed-files:
+  - any-glob-to-any-file: [.github/workflows/*]
+code:
+- changed-files:
+  - any-glob-to-any-file: [src/**]
+package:
+- changed-files:
+  - any-glob-to-any-file: [package.json, pnpm-lock.yaml]
