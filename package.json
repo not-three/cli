@@ -26,9 +26,12 @@
     "pastebin"
   ],
   "scripts": {
-    "build": "nest build",
-    "dev": "nest build && node dist/src/not3.js",
-    "start": "node dist/src/not3.js",
+    "build": "pnpm build:license && pnpm build:nest",
+    "build:license": "pnpm build:license:generate && pnpm build:license:json",
+    "build:license:generate": "generate-license-file --input package.json --output src/license.txt --overwrite",
+    "build:license:json": "node -e \"const fs = require('fs'); fs.writeFileSync('src/license.json',JSON.stringify({value: fs.readFileSync('src/license.txt', 'utf8')}));\"",
+    "build:nest": "nest build",
+    "dev": "node dist/src/not3.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
@@ -54,6 +57,7 @@
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "generate-license-file": "^3.7.0",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
