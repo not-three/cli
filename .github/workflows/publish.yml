@@ -7,6 +7,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +33,37 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Zip client bundle
+        run: zip -r client-bundle.zip dist
+
+      - name: Upload client bundle to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client-bundle.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish package on NPM
         run: pnpm publish . --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Build and Push Docker Image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          tags: latest,${{ github.sha }},${{ github.ref_name }}
+          image: api
+          registry: ghcr.io
+          directory: ./
+          dockerfile: ./Dockerfile
+          addLatest: false
+          multiPlatform: true
+          platform: linux/amd64,linux/arm64
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
