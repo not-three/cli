@@ -10,6 +10,7 @@ import { SaveCommand } from './commands/save.command';
 import { SeedCommand } from './commands/seed.command';
 import { InfoCommand } from './commands/info.command';
 import { StatsCommand } from './commands/stats.command';
+import { EditCommand } from './commands/edit.command';
 
 @Module({
   providers: [
@@ -24,6 +25,7 @@ import { StatsCommand } from './commands/stats.command';
     SeedCommand,
     InfoCommand,
     StatsCommand,
+    EditCommand,
   ],
 })
 export class AppModule {}
