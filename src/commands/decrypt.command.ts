@@ -2,11 +2,11 @@ import { Command, CommandRunner, Option } from 'nest-commander';
 import { Crypto } from '@not3/sdk';
 import { readFileSync, writeFileSync } from 'fs';
 import { CommonService } from 'src/common.service';
+import { prompt } from 'enquirer';
 
 @Command({
   name: 'decrypt',
   description: 'Decrypt something',
-  arguments: '<seed>',
 })
 export class DecryptCommand extends CommandRunner {
   constructor(private readonly common: CommonService) {
@@ -41,10 +41,26 @@ export class DecryptCommand extends CommandRunner {
     return file;
   }
 
+  @Option({
+    flags: '-s, --seed <seed>',
+    description: 'Seed for encryption/decryption',
+  })
+  parseSeed(seed: string) {
+    return seed;
+  }
+
   async run(params: string[], options: Record<string, any>) {
+    if (!options.seed)
+      options.seed = (
+        (await prompt({
+          type: 'password',
+          name: 'seed',
+          message: 'Seed for encryption/decryption',
+        })) as any
+      ).seed;
     const mode = options.crypto || 'cbc';
     if (!['cbc', 'gcm'].includes(mode)) throw new Error('Invalid crypto mode');
-    const key = await Crypto.generateKey(params[0], mode).catch(() => {
+    const key = await Crypto.generateKey(options.seed, mode).catch(() => {
       throw new Error('Invalid seed');
     });
 
