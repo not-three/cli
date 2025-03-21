@@ -63,7 +63,7 @@ export class UploadCommand extends BaseCommandRunner {
     await upload.start((start, end) => {
       const stream = createReadStream(params[0], { start, end: end - 1 });
       return new Promise<ArrayBuffer>((resolve, reject) => {
-        const data = [];
+        const data: Buffer[] = [];
         stream.on('data', (chunk) => {
           data.push(Buffer.from(chunk));
         });
