@@ -3,6 +3,7 @@ FROM node:23-alpine
 COPY dist /app/
 WORKDIR /app
 
+RUN apk add --no-cache nano
 RUN npm i -g pnpm
 RUN pnpm install --prod
 
