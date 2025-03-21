@@ -3,7 +3,8 @@ FROM node:23-alpine
 COPY dist /app/
 WORKDIR /app
 
-RUN npm install --only=production
+RUN npm i -g pnpm
+RUN pnpm install --prod
 
 ENV NODE_ENV=production
 LABEL org.opencontainers.image.source=https://github.com/not-three/api
