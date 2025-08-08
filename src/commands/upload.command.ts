@@ -67,7 +67,15 @@ export class UploadCommand extends BaseCommandRunner {
         stream.on('data', (chunk: Buffer) => {
           data.push(Buffer.from(chunk));
         });
-        stream.on('end', () => resolve(Buffer.concat(data)));
+        stream.on('end', () => {
+          const buffer = Buffer.concat(data);
+          const arrayBuffer = new ArrayBuffer(buffer.length);
+          const view = new Uint8Array(arrayBuffer);
+          for (let i = 0; i < buffer.length; i++) {
+            view[i] = buffer[i];
+          }
+          resolve(arrayBuffer);
+        });
         stream.on('error', reject);
       });
     });
