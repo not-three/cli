@@ -24,8 +24,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       nest-commander:
-        specifier: ^3.18.0
-        version: 3.18.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@types/inquirer@8.2.10)(typescript@5.9.2)
+        specifier: ^3.19.0
+        version: 3.19.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@types/inquirer@8.2.10)(@types/node@24.2.1)(typescript@5.9.2)
       reflect-metadata:
         specifier: ^0.2.0
         version: 0.2.2
@@ -218,6 +218,15 @@ packages:
 
   '@inquirer/expand@4.0.17':
     resolution: {integrity: sha512-PSqy9VmJx/VbE3CT453yOfNa+PykpKg/0SYP7odez1/NWBGuDXgPhp4AeGYYKjhLn5lUUavVS/JbeYMPdH50Mw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/external-editor@1.0.1':
+    resolution: {integrity: sha512-Oau4yL24d2B5IL4ma4UpbQigkVhzPDXLoqy1ggK4gnHg/stmkffJE4oOXHXF3uz0UEpywG68KcyXsyYpA1Re/Q==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -684,6 +693,9 @@ packages:
   '@types/node@24.2.1':
     resolution: {integrity: sha512-DRh5K+ka5eJic8CjH7td8QpYEV6Zo10gfRkjHCO3weqZHWDtAaSTFtl4+VMqOJ4N5jcuhZ9/l+yy8rVgw7BQeQ==}
 
+  '@types/node@24.3.0':
+    resolution: {integrity: sha512-aPTXCrfwnDLj4VvXrm+UUCQjNEvJgNA8s5F1cvwQU+3KNltTOkBm1j30uNLyqqPNe7gE3KFzImYoZEfLhp4Yow==}
+
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
 
@@ -1013,6 +1025,9 @@ packages:
 
   chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
+
+  chardet@2.1.0:
+    resolution: {integrity: sha512-bNFETTG/pM5ryzQ9Ad0lJOTa6HWD/YsScAR3EnCPZRPlQh77JocYktSHOUHelyhm8IARL+o4c4F1bP5KVOjiRA==}
 
   chokidar@4.0.3:
     resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
@@ -1642,8 +1657,8 @@ packages:
     resolution: {integrity: sha512-+N0ngpO3e7cRUWOJAS7qw0IZIVc6XPrW4MlFBdD066F2L4k1L6ker3hLqSq7iXxU5tgS4WGkIUElWn5vogAEnw==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
-  inquirer@8.2.6:
-    resolution: {integrity: sha512-M1WuAmb7pn9zdFRtQYk26ZBoY043Sse0wVDdk4Bppr+JOXyQYybdtvK+l9wUibhtjdjvtoiNy8tk+EgsYIUqKg==}
+  inquirer@8.2.7:
+    resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
 
   ip-address@9.0.5:
@@ -1774,8 +1789,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  libphonenumber-js@1.12.10:
-    resolution: {integrity: sha512-E91vHJD61jekHHR/RF/E83T/CMoaLXT7cwYA75T4gim4FZjnM6hbJjVIGg7chqlSqRsSvQ3izGmOjHy1SQzcGQ==}
+  libphonenumber-js@1.12.13:
+    resolution: {integrity: sha512-QZXnR/OGiDcBjF4hGk0wwVrPcZvbSSyzlvkjXv5LFfktj7O2VZDrt4Xs8SgR/vOFco+qk1i8J43ikMXZoTrtPw==}
 
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
@@ -1975,8 +1990,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  nest-commander@3.18.0:
-    resolution: {integrity: sha512-NWtodOl2aStnApWp9oajCoJW71lqN0CCjf9ygOWxpXnG3o4nQ8ZO5CgrExfVw2+0CVC877hr0rFR7FSu2rypGg==}
+  nest-commander@3.19.0:
+    resolution: {integrity: sha512-KH/4gYqI3S9RFxO6dw2aspW00k2PZmUsUyDTkGVmdmjW9YryKFmWX2FQAjTYSKnK5Nej1imDktGpZ/Jn3MX60g==}
     peerDependencies:
       '@nestjs/common': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
       '@nestjs/core': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
@@ -2896,6 +2911,13 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.2.1
 
+  '@inquirer/external-editor@1.0.1(@types/node@24.2.1)':
+    dependencies:
+      chardet: 2.1.0
+      iconv-lite: 0.6.3
+    optionalDependencies:
+      '@types/node': 24.2.1
+
   '@inquirer/figures@1.0.13': {}
 
   '@inquirer/input@4.2.1(@types/node@24.2.1)':
@@ -3454,6 +3476,10 @@ snapshots:
     dependencies:
       undici-types: 7.10.0
 
+  '@types/node@24.3.0':
+    dependencies:
+      undici-types: 7.10.0
+
   '@types/qs@6.14.0': {}
 
   '@types/range-parser@1.2.7': {}
@@ -3483,7 +3509,7 @@ snapshots:
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 24.2.1
+      '@types/node': 24.3.0
 
   '@types/validator@13.15.2':
     optional: true
@@ -3862,6 +3888,8 @@ snapshots:
 
   chardet@0.7.0: {}
 
+  chardet@2.1.0: {}
+
   chokidar@4.0.3:
     dependencies:
       readdirp: 4.1.2
@@ -3878,7 +3906,7 @@ snapshots:
   class-validator@0.14.1:
     dependencies:
       '@types/validator': 13.15.2
-      libphonenumber-js: 1.12.10
+      libphonenumber-js: 1.12.13
       validator: 13.15.15
     optional: true
 
@@ -4546,13 +4574,13 @@ snapshots:
 
   ini@5.0.0: {}
 
-  inquirer@8.2.6:
+  inquirer@8.2.7(@types/node@24.2.1):
     dependencies:
+      '@inquirer/external-editor': 1.0.1(@types/node@24.2.1)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-width: 3.0.0
-      external-editor: 3.1.0
       figures: 3.2.0
       lodash: 4.17.21
       mute-stream: 0.0.8
@@ -4563,6 +4591,8 @@ snapshots:
       strip-ansi: 6.0.1
       through: 2.3.8
       wrap-ansi: 6.2.0
+    transitivePeerDependencies:
+      - '@types/node'
 
   ip-address@9.0.5:
     dependencies:
@@ -4664,7 +4694,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libphonenumber-js@1.12.10:
+  libphonenumber-js@1.12.13:
     optional: true
 
   lines-and-columns@1.2.4: {}
@@ -4841,7 +4871,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  nest-commander@3.18.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@types/inquirer@8.2.10)(typescript@5.9.2):
+  nest-commander@3.19.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@types/inquirer@8.2.10)(@types/node@24.2.1)(typescript@5.9.2):
     dependencies:
       '@fig/complete-commander': 3.2.0(commander@11.1.0)
       '@golevelup/nestjs-discovery': 4.0.3(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)
@@ -4850,8 +4880,9 @@ snapshots:
       '@types/inquirer': 8.2.10
       commander: 11.1.0
       cosmiconfig: 8.3.6(typescript@5.9.2)
-      inquirer: 8.2.6
+      inquirer: 8.2.7(@types/node@24.2.1)
     transitivePeerDependencies:
+      - '@types/node'
       - typescript
 
   node-abort-controller@3.1.1: {}
