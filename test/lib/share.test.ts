@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { FragmentData } from '@not3/sdk';
 import { fileShare, noteShare } from '../../src/lib/share';
 
 describe('noteShare', () => {
@@ -29,7 +30,21 @@ describe('noteShare', () => {
       seed: 'seedX',
       mode: 'cbc',
     });
-    expect(custom.url.length).to.be.greaterThan(def.url.length);
+    expect(FragmentData.fromURL(custom.url).server).to.equal(
+      'https://other.example/',
+    );
+    expect(FragmentData.fromURL(def.url).server).to.equal(null);
+  });
+  it('normalizes a trailing-slash apiServer to avoid double slashes', () => {
+    const { url } = noteShare({
+      uiUrl: 'https://not-th.re/',
+      apiServer: 'https://other.example/',
+      id: 'n1',
+      seed: 'seedX',
+      mode: 'cbc',
+    });
+    expect(FragmentData.fromURL(url).server).to.equal('https://other.example/');
+    expect(url).to.not.match(/example\/\//);
   });
 });
 

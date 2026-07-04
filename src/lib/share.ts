@@ -4,15 +4,15 @@ import { CryptoMode, DEFAULTS, normalizeServerUrl } from './config';
 function generator(
   uiUrl: string,
   apiServer: string,
-): { gen: ShareGenerator; isDefault: boolean } {
-  const isDefault =
-    normalizeServerUrl(apiServer) === normalizeServerUrl(DEFAULTS.server);
+): { gen: ShareGenerator; isDefault: boolean; server: string } {
+  const server = normalizeServerUrl(apiServer);
+  const isDefault = server === normalizeServerUrl(DEFAULTS.server);
   const gen = new ShareGenerator({
     uiUrl,
-    apiUrl: apiServer + '/',
+    apiUrl: server + '/',
     storeServer: !isDefault,
   });
-  return { gen, isDefault };
+  return { gen, isDefault, server };
 }
 
 export function noteShare(opts: {
@@ -22,10 +22,10 @@ export function noteShare(opts: {
   seed: string;
   mode: CryptoMode;
 }): { url: string; curl: string } {
-  const { gen, isDefault } = generator(opts.uiUrl, opts.apiServer);
+  const { gen, isDefault, server } = generator(opts.uiUrl, opts.apiServer);
   const fragment = new FragmentData({
     seed: opts.seed,
-    server: isDefault ? null : opts.apiServer + '/',
+    server: isDefault ? null : server + '/',
     cryptoMode: opts.mode,
   });
   return {
