@@ -60,7 +60,14 @@ export abstract class BaseCommand extends Command {
   protected async catch(
     err: Error & { exitCode?: number; isAxiosError?: boolean },
   ): Promise<never> {
-    if (this.verbose) throw err;
+    const verbose =
+      this.verbose ||
+      process.argv.includes('--verbose') ||
+      Boolean(process.env.NOT3_VERBOSE);
+    if (verbose) {
+      process.stderr.write((err.stack ?? String(err)) + '\n');
+      this.exit(1);
+    }
     if (err instanceof UsageError) this.error(err.message, { exit: 2 });
     if (err instanceof IncompatibleServerError)
       this.error(err.message, { exit: 1 });

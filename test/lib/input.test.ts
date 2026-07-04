@@ -47,6 +47,21 @@ describe('resolveTextInput', () => {
       expect((err as Error).message).to.match(/No input provided/);
     }
   });
+  it('falls back to argv when piped stdin is empty (regression: empty stdin silently wins)', async () => {
+    const text = await resolveTextInput({
+      argv: ['hi'],
+      stdin: fakeStdin(''),
+    });
+    expect(text).to.equal('hi');
+  });
+  it('throws UsageError when piped stdin is empty and no argv is given', async () => {
+    try {
+      await resolveTextInput({ argv: [], stdin: fakeStdin('') });
+      throw new Error('should have thrown');
+    } catch (err) {
+      expect((err as Error).message).to.match(/No input provided/);
+    }
+  });
 });
 
 describe('resolveSeed', () => {

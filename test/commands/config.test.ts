@@ -71,4 +71,36 @@ describe('not3 config', () => {
     const { stdout } = await runCommand(['config', 'get', 'server']);
     expect(stdout).to.contain('https://api.not-th.re');
   });
+
+  it('get is server-scoped like set/unset (regression: -s rejected as unknown flag)', async () => {
+    await runCommand(['config', 'set', 'server', 'https://self.example']);
+    await runCommand(['config', 'set', 'password', 'pw1']);
+    await runCommand([
+      'config',
+      'set',
+      'password',
+      'pw2',
+      '-s',
+      'https://other.example',
+    ]);
+    const get = await runCommand([
+      'config',
+      'get',
+      'password',
+      '-s',
+      'https://other.example',
+    ]);
+    expect(get.error).to.equal(undefined);
+    expect(get.stdout).to.contain('••••');
+
+    const server = await runCommand([
+      'config',
+      'get',
+      'server',
+      '-s',
+      'https://other.example',
+    ]);
+    expect(server.error).to.equal(undefined);
+    expect(server.stdout).to.contain('https://other.example');
+  });
 });

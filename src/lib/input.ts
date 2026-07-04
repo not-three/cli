@@ -19,7 +19,10 @@ export async function resolveTextInput(opts: {
 }): Promise<string> {
   const stdin = opts.stdin ?? process.stdin;
   if (opts.file) return readFileSync(opts.file, 'utf8');
-  if (!stdin.isTTY) return readStream(stdin);
+  if (!stdin.isTTY) {
+    const piped = await readStream(stdin);
+    if (piped.trim() !== '') return piped;
+  }
   if (opts.argv.length > 0) return opts.argv.join(' ');
   throw new UsageError(
     'No input provided (pass text as arguments, use --file, or pipe via stdin)',

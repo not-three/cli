@@ -1,6 +1,7 @@
 import { Args } from '@oclif/core';
 import { BaseCommand } from '../../base.command';
 import { CONFIG_KEYS, ConfigKey } from '../../lib/config';
+import { serverFlags } from '../../lib/flags';
 
 export default class ConfigGet extends BaseCommand {
   static description = 'Print the resolved value of a config key';
@@ -10,7 +11,7 @@ export default class ConfigGet extends BaseCommand {
       description: `One of: ${CONFIG_KEYS.join(', ')}`,
     }),
   };
-  static flags = BaseCommand.baseFlags;
+  static flags = { ...BaseCommand.baseFlags, server: serverFlags.server };
 
   async run(): Promise<void> {
     const { args, flags } = await this.parse(ConfigGet);
