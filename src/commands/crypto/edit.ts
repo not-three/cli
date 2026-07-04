@@ -64,10 +64,16 @@ export default class CryptoEdit extends BaseCommand {
     );
     writeFileSync(tempFile, dec, { mode: 0o600 });
     try {
-      const code = await new Promise<number>((resolve) => {
-        spawn(editor, [tempFile], { stdio: 'inherit' }).on('exit', (c) =>
-          resolve(c ?? 1),
+      const code = await new Promise<number>((resolve, reject) => {
+        const child = spawn(editor, [tempFile], { stdio: 'inherit' });
+        child.on('error', (err) =>
+          reject(
+            new UsageError(
+              `Failed to start editor "${editor}": ${err.message}`,
+            ),
+          ),
         );
+        child.on('exit', (c) => resolve(c ?? 1));
       });
       if (code !== 0)
         throw new Error(

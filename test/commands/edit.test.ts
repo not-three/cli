@@ -1,6 +1,12 @@
 import { runCommand } from '@oclif/test';
 import { expect } from 'chai';
-import { chmodSync, mkdtempSync, readFileSync, writeFileSync } from 'fs';
+import {
+  chmodSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import not3Sdk from '@not3/sdk';
@@ -79,5 +85,38 @@ describe('not3 crypto edit', () => {
       process.env.PATH = oldPath;
       if (oldEditor) process.env.EDITOR = oldEditor;
     }
+  });
+
+  it('fails cleanly and removes the temp file when the editor cannot be spawned', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'not3-edit-'));
+    const encFile = join(dir, 'note.enc');
+    const seed = Crypto.generateSeed();
+    const key = await Crypto.generateKey(seed, 'cbc');
+    writeFileSync(encFile, await Crypto.encrypt('original', key, 'cbc'));
+
+    const before = readdirSync(tmpdir()).filter((f) =>
+      f.startsWith('not3-edit-'),
+    );
+
+    const { error } = await runCommand([
+      'crypto',
+      'edit',
+      encFile,
+      '--seed',
+      seed,
+      '-e',
+      '/nonexistent/editor-binary',
+      '--output-mode',
+      'simple',
+    ]);
+    expect(error?.message ?? '').to.match(/Failed to start editor/);
+
+    const after = readdirSync(tmpdir()).filter((f) =>
+      f.startsWith('not3-edit-'),
+    );
+    expect(after).to.deep.equal(before);
+
+    const dec = await Crypto.decrypt(readFileSync(encFile, 'utf8'), key, 'cbc');
+    expect(dec).to.equal('original');
   });
 });
