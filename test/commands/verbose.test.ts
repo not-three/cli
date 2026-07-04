@@ -65,4 +65,72 @@ describe('--verbose stack traces (regression: oclif default handler swallows sta
     expect(failed, 'command should have failed').to.equal(true);
     expect(stderr).to.not.contain('at ');
   });
+
+  it('treats NOT3_VERBOSE=0/false as disabled', () => {
+    for (const value of ['0', 'false']) {
+      let stderr = '';
+      let failed = false;
+      try {
+        execFileSync(
+          'node',
+          [
+            CLI,
+            'crypto',
+            'encrypt',
+            'hi',
+            '--seed',
+            'bogus',
+            '--output-mode',
+            'simple',
+          ],
+          {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe'],
+            env: { ...process.env, NOT3_VERBOSE: value },
+          },
+        );
+      } catch (err) {
+        failed = true;
+        stderr = (err as { stderr: string }).stderr;
+      }
+      expect(
+        failed,
+        `command should have failed (NOT3_VERBOSE=${value})`,
+      ).to.equal(true);
+      expect(
+        stderr,
+        `NOT3_VERBOSE=${value} must not enable stacks`,
+      ).to.not.contain('at ');
+    }
+  });
+
+  it('treats NOT3_VERBOSE=1 as enabled', () => {
+    let stderr = '';
+    let failed = false;
+    try {
+      execFileSync(
+        'node',
+        [
+          CLI,
+          'crypto',
+          'encrypt',
+          'hi',
+          '--seed',
+          'bogus',
+          '--output-mode',
+          'simple',
+        ],
+        {
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+          env: { ...process.env, NOT3_VERBOSE: '1' },
+        },
+      );
+    } catch (err) {
+      failed = true;
+      stderr = (err as { stderr: string }).stderr;
+    }
+    expect(failed, 'command should have failed').to.equal(true);
+    expect(stderr).to.contain('at ');
+  });
 });

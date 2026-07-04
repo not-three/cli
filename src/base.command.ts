@@ -60,10 +60,11 @@ export abstract class BaseCommand extends Command {
   protected async catch(
     err: Error & { exitCode?: number; isAxiosError?: boolean },
   ): Promise<never> {
+    const envVerbose = (process.env.NOT3_VERBOSE ?? '').toLowerCase();
     const verbose =
       this.verbose ||
       process.argv.includes('--verbose') ||
-      Boolean(process.env.NOT3_VERBOSE);
+      !['', '0', 'false'].includes(envVerbose);
     if (verbose) {
       process.stderr.write((err.stack ?? String(err)) + '\n');
       this.exit(1);
