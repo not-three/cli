@@ -33,6 +33,7 @@
     "bin": "not3",
     "dirname": "not3",
     "commands": "./dist/commands",
+    "helpClass": "./dist/help",
     "topicSeparator": " ",
     "topics": {
       "note": { "description": "Save and fetch encrypted notes" },
