@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# local docs (superpowers specs/plans)
+/docs
+
 # Logs
 logs
 *.log
