@@ -1,57 +1,88 @@
+import { Command, Flags } from '@oclif/core';
 import { Not3Client } from '@not3/sdk';
-import { CommandRunner, Option } from 'nest-commander';
-import { CommonService } from './common.service';
+import { createApi } from './lib/api';
+import {
+  CryptoMode,
+  loadConfig,
+  Not3Config,
+  OutputModeSetting,
+  ResolvedSettings,
+  resolveSettings,
+} from './lib/config';
+import { IncompatibleServerError, UsageError } from './lib/errors';
+import { Reporter, resolveOutputMode } from './lib/reporter';
 
-export class BaseCommandRunner extends CommandRunner {
-  constructor(protected readonly common: CommonService) {
-    super();
+export abstract class BaseCommand extends Command {
+  static baseFlags = {
+    'output-mode': Flags.string({
+      description: 'Output style',
+      options: ['auto', 'pretty', 'simple', 'stdout', 'raw'],
+      env: 'NOT3_OUTPUT_MODE',
+    }),
+    verbose: Flags.boolean({
+      description: 'Show full stack traces on errors',
+      env: 'NOT3_VERBOSE',
+    }),
+  };
+
+  private verbose = false;
+
+  protected userConfig(): Not3Config {
+    return loadConfig(this.config.configDir);
   }
 
-  @Option({
-    flags: '-s, --server <url>',
-    description: 'Server URL',
-    name: 'server',
-    defaultValue: 'https://api.not-th.re',
-  })
-  parseServer(url: string) {
-    return url;
-  }
-
-  @Option({
-    flags: '-p, --password <password>',
-    name: 'password',
-    description: 'Password for the server',
-  })
-  parsePassword(password: string) {
-    return password;
-  }
-
-  @Option({
-    flags: '--no-version-check',
-    name: 'noVersionCheck',
-    description: 'Disable version check',
-  })
-  parseNoVersionCheck() {
-    return true;
-  }
-
-  protected async getApi(options: Record<string, any>) {
-    const api = new Not3Client({
-      baseUrl: options.server,
-      password: options.password,
+  protected resolveFrom(flags: Record<string, unknown>): ResolvedSettings {
+    this.verbose = Boolean(flags.verbose);
+    return resolveSettings(this.userConfig(), {
+      server: flags.server as string | undefined,
+      password: flags.password as string | undefined,
+      mode: flags.mode as CryptoMode | undefined,
+      editor: flags.editor as string | undefined,
+      outputMode: flags['output-mode'] as OutputModeSetting | undefined,
+      noVersionCheck: Boolean(flags['no-version-check']),
     });
-    const sysApi = api.system();
-    if (!options.noVersionCheck && !(await api.isCompatible(sysApi))) {
-      console.error('Server is not compatible with this client');
-      console.error('Server version:', (await sysApi.info()).version);
-      console.error('Compatible version:', api.getVersionRange());
-      process.exit(1);
-    }
-    return api;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async run(params: string[], options: Record<string, any>): Promise<void> {
-    throw new Error('Method not implemented');
+  protected makeReporter(s: ResolvedSettings): Reporter {
+    return new Reporter(
+      resolveOutputMode(s.outputMode, Boolean(process.stdout.isTTY)),
+    );
+  }
+
+  protected makeApi(s: ResolvedSettings): Promise<Not3Client> {
+    return createApi({
+      server: s.server,
+      password: s.password,
+      versionCheck: s.versionCheck,
+    });
+  }
+
+  protected async catch(
+    err: Error & { exitCode?: number; isAxiosError?: boolean },
+  ): Promise<never> {
+    const envVerbose = (process.env.NOT3_VERBOSE ?? '').toLowerCase();
+    const verbose =
+      this.verbose ||
+      process.argv.includes('--verbose') ||
+      !['', '0', 'false'].includes(envVerbose);
+    if (verbose) {
+      process.stderr.write((err.stack ?? String(err)) + '\n');
+      this.exit(1);
+    }
+    if (err instanceof UsageError) this.error(err.message, { exit: 2 });
+    if (err instanceof IncompatibleServerError)
+      this.error(err.message, { exit: 1 });
+    if (err.isAxiosError) {
+      const res = (
+        err as unknown as {
+          response?: { status: number; data?: { message?: string } };
+        }
+      ).response;
+      const detail = res
+        ? `${res.status}${res.data?.message ? ` ${res.data.message}` : ''}`
+        : err.message;
+      this.error(`Request failed: ${detail}`, { exit: 1 });
+    }
+    throw err;
   }
 }
