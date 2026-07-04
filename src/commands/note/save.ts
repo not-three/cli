@@ -10,7 +10,10 @@ export default class NoteSave extends BaseCommand {
   static aliases = ['s'];
   static strict = false;
   static args = {
-    content: Args.string({ description: 'Note text (or use --file / stdin)' }),
+    content: Args.string({
+      description: 'Note text (or use --file / stdin)',
+      ignoreStdin: true,
+    }),
   };
   static flags = {
     ...BaseCommand.baseFlags,

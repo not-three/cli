@@ -8,7 +8,12 @@ import { resolveTextInput } from '../../lib/input';
 export default class CryptoEncrypt extends BaseCommand {
   static description = 'Encrypt text locally (arguments, --file, or stdin)';
   static strict = false;
-  static args = { input: Args.string({ description: 'Text to encrypt' }) };
+  static args = {
+    input: Args.string({
+      description: 'Text to encrypt',
+      ignoreStdin: true,
+    }),
+  };
   static flags = {
     ...BaseCommand.baseFlags,
     seed: seedFlag,
