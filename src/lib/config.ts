@@ -68,6 +68,7 @@ export function loadConfig(configDir: string): Not3Config {
 
 export function saveConfig(configDir: string, cfg: Not3Config): void {
   mkdirSync(configDir, { recursive: true, mode: 0o700 });
+  chmodSync(configDir, 0o700);
   const file = configFile(configDir);
   writeFileSync(file, JSON.stringify(cfg, null, 2) + '\n', { mode: 0o600 });
   chmodSync(file, 0o600);

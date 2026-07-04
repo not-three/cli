@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { mkdtempSync, statSync, writeFileSync } from 'fs';
+import { mkdirSync, mkdtempSync, statSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import {
@@ -45,6 +45,12 @@ describe('load/saveConfig', () => {
     const dir = mkdtempSync(join(tmpdir(), 'not3-'));
     writeFileSync(join(dir, 'config.json'), '{nope');
     expect(() => loadConfig(dir)).to.throw(/config file .* is not valid JSON/i);
+  });
+  it('tightens permissions on a pre-existing config directory', () => {
+    const dir = join(mkdtempSync(join(tmpdir(), 'not3-')), 'cfg');
+    mkdirSync(dir, { recursive: true, mode: 0o755 });
+    saveConfig(dir, { server: 'https://a.example' });
+    expect(statSync(dir).mode & 0o777).to.equal(0o700);
   });
 });
 
