@@ -17,6 +17,13 @@ describe('readFileChunk', () => {
     expect(Buffer.from(buf).toString()).to.equal('cde');
     expect(buf).to.be.instanceOf(ArrayBuffer);
   });
+
+  it('resolves an empty ArrayBuffer for a zero-length range', async () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'not3-')), 'f');
+    writeFileSync(file, 'abcdefgh');
+    const buf = await readFileChunk(file, 3, 3);
+    expect(buf.byteLength).to.equal(0);
+  });
 });
 
 describe('makeFileSink (regression for not-three/main#15)', () => {

@@ -5,6 +5,7 @@ export function readFileChunk(
   start: number,
   endExclusive: number,
 ): Promise<ArrayBuffer> {
+  if (endExclusive <= start) return Promise.resolve(new ArrayBuffer(0));
   return new Promise((resolve, reject) => {
     const stream = createReadStream(path, { start, end: endExclusive - 1 });
     const parts: Buffer[] = [];
