@@ -27,12 +27,18 @@ export default class FileDownloadCommand extends BaseCommand {
     const total = download.getTotalChunks();
 
     const stream = createWriteStream(args.out);
+    const streamFailure = new Promise<never>((_, reject) => {
+      stream.on('error', reject);
+    });
     const sink = makeFileSink(stream);
     const bar = reporter.progress('Downloading', total);
-    await download.start(async (buf, index) => {
-      await sink(buf, index);
-      bar.update(index + 1);
-    });
+    await Promise.race([
+      download.start(async (buf, index) => {
+        await sink(buf, index);
+        bar.update(index + 1);
+      }),
+      streamFailure,
+    ]);
     bar.finish();
     await new Promise<void>((resolve, reject) =>
       stream.end((err?: Error | null) => (err ? reject(err) : resolve())),
