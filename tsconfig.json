@@ -12,6 +12,10 @@
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "outDir": "dist",
+    "types": [
+      "node",
+      "mocha"
+    ],
     "rootDirs": [
       "src",
       "test"
