@@ -60,12 +60,12 @@ export class Reporter {
           this.out.write(
             `  ${DIM}${label.padEnd(5)}${RESET} ${CYAN}${value}${RESET}\n`,
           );
-        this.out.write('\n');
+        this.out.write('\n' + renderQr(info.url) + '\n');
         kv('ID', info.id);
         kv('Seed', info.seed);
         kv('URL', info.url);
         kv('cURL', info.curl);
-        this.out.write('\n' + renderQr(info.url) + '\n');
+        this.out.write('\n');
         break;
       }
       case 'simple':
