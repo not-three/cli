@@ -109,4 +109,23 @@ describe('Reporter.result/info/progress', () => {
     p.finish();
     expect(err.data).to.equal('');
   });
+  it('progress handles total=0 without NaN output', () => {
+    const a = make('simple');
+    a.r.progress('x', 0).update(0);
+    expect(a.err.data).to.not.contain('NaN');
+    expect(a.err.data).to.contain('0/0');
+    const b = make('pretty');
+    b.r.progress('x', 0).update(0);
+    expect(b.err.data).to.not.contain('NaN');
+  });
+});
+
+describe('Reporter.json', () => {
+  it('json pretty-prints to stdout in every mode', () => {
+    for (const mode of ['pretty', 'simple', 'stdout', 'raw'] as const) {
+      const { out, r } = make(mode);
+      r.json({ a: 1 });
+      expect(out.data).to.equal('{\n  "a": 1\n}\n');
+    }
+  });
 });

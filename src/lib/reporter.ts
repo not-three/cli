@@ -86,11 +86,13 @@ export class Reporter {
 
   progress(label: string, total: number): Progress {
     if (this.mode === 'raw') return { update: () => {}, finish: () => {} };
+    const fraction = (done: number) =>
+      total > 0 ? Math.min(done / total, 1) : 1;
     if (this.mode === 'pretty') {
       const width = 20;
       return {
         update: (done) => {
-          const filled = Math.min(width, Math.round((done / total) * width));
+          const filled = Math.min(width, Math.round(fraction(done) * width));
           this.err.write(
             `\r${label} [${'='.repeat(filled)}${' '.repeat(width - filled)}] ${done}/${total}`,
           );
@@ -101,12 +103,12 @@ export class Reporter {
     let lastStep = -1;
     return {
       update: (done) => {
-        const step = Math.floor(((done / total) * 100) / 10);
+        const step = Math.floor((fraction(done) * 100) / 10);
         if (step <= lastStep && done !== total) return;
         if (done === total && lastStep === 10) return;
         lastStep = done === total ? 10 : step;
         this.err.write(
-          `${label}: ${done}/${total} (${Math.floor((done / total) * 100)}%)\n`,
+          `${label}: ${done}/${total} (${Math.floor(fraction(done) * 100)}%)\n`,
         );
       },
       finish: () => {},
