@@ -23,11 +23,11 @@ export default class ConfigGet extends BaseCommand {
       );
     }
     const s = this.resolveFrom(flags);
-    if (key === 'password') {
-      this.log(s.password ? '••••' : '(not set)');
+    if (key === 'password' || key === 'statsPassword') {
+      this.log(s[key] ? '••••' : '(not set)');
       return;
     }
-    const value = s[key as Exclude<ConfigKey, 'password'>];
+    const value = s[key as Exclude<ConfigKey, 'password' | 'statsPassword'>];
     this.log(value === undefined ? '(not set)' : String(value));
   }
 }

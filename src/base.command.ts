@@ -36,6 +36,7 @@ export abstract class BaseCommand extends Command {
     return resolveSettings(this.userConfig(), {
       server: flags.server as string | undefined,
       password: flags.password as string | undefined,
+      statsPassword: flags['stats-password'] as string | undefined,
       mode: flags.mode as CryptoMode | undefined,
       editor: flags.editor as string | undefined,
       outputMode: flags['output-mode'] as OutputModeSetting | undefined,

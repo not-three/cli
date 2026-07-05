@@ -17,6 +17,11 @@ export const serverFlags = {
   }),
 };
 
+export const statsPasswordFlag = Flags.string({
+  description: 'Stats password (defaults to the server password)',
+  env: 'NOT3_STATS_PASSWORD',
+});
+
 export const seedFlag = Flags.string({
   description:
     'Encryption seed (prompted for on a TTY when required and omitted)',

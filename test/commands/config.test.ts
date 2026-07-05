@@ -60,6 +60,48 @@ describe('not3 config', () => {
     expect(secrets.stdout).to.contain('topsecret');
   });
 
+  it('stores statsPassword per server, independent of the password', async () => {
+    await runCommand(['config', 'set', 'server', 'https://self.example']);
+    await runCommand(['config', 'set', 'statsPassword', 'stats1']);
+    const cfg = readCfg() as {
+      servers: Record<string, { password?: string; statsPassword?: string }>;
+    };
+    expect(cfg.servers['https://self.example'].statsPassword).to.equal(
+      'stats1',
+    );
+    expect(cfg.servers['https://self.example'].password).to.equal(undefined);
+  });
+
+  it('masks statsPassword in get and list, reveals with --show-secrets', async () => {
+    await runCommand(['config', 'set', 'statsPassword', 'statssecret']);
+    const get = await runCommand(['config', 'get', 'statsPassword']);
+    expect(get.stdout).to.not.contain('statssecret');
+    expect(get.stdout).to.contain('••••');
+    const list = await runCommand(['config', 'list']);
+    expect(list.stdout).to.not.contain('statssecret');
+    const secrets = await runCommand(['config', 'list', '--show-secrets']);
+    expect(secrets.stdout).to.contain('statssecret');
+  });
+
+  it('unsets statsPassword without touching the password', async () => {
+    await runCommand(['config', 'set', 'password', 'pw1']);
+    await runCommand(['config', 'set', 'statsPassword', 'stats1']);
+    await runCommand(['config', 'unset', 'statsPassword']);
+    const cfg = readCfg() as {
+      servers: Record<string, { password?: string; statsPassword?: string }>;
+    };
+    const entry = cfg.servers['https://api.not-th.re'];
+    expect(entry.password).to.equal('pw1');
+    expect(entry.statsPassword).to.equal(undefined);
+  });
+
+  it('unsets statsPassword and cleans up empty server entries', async () => {
+    await runCommand(['config', 'set', 'statsPassword', 'stats1']);
+    await runCommand(['config', 'unset', 'statsPassword']);
+    const cfg = readCfg() as { servers?: Record<string, unknown> };
+    expect(cfg.servers ?? {}).to.deep.equal({});
+  });
+
   it('unsets password and cleans up empty server entries', async () => {
     await runCommand(['config', 'set', 'password', 'pw1']);
     await runCommand(['config', 'unset', 'password']);
