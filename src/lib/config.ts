@@ -52,7 +52,7 @@ export function normalizeServerUrl(raw: string): string {
   return `${url.protocol}//${url.host}${path}`;
 }
 
-function configFile(configDir: string): string {
+export function configFile(configDir: string): string {
   return join(configDir, 'config.json');
 }
 
