@@ -13,7 +13,7 @@ export type OutputModeSetting = 'auto' | 'pretty' | 'simple' | 'stdout' | 'raw';
 
 export interface Not3Config {
   server?: string;
-  servers?: Record<string, { password?: string }>;
+  servers?: Record<string, { password?: string; statsPassword?: string }>;
   mode?: CryptoMode;
   editor?: string;
   versionCheck?: boolean;
@@ -32,6 +32,7 @@ export const DEFAULTS = {
 export const CONFIG_KEYS = [
   'server',
   'password',
+  'statsPassword',
   'mode',
   'editor',
   'versionCheck',
@@ -77,6 +78,7 @@ export function saveConfig(configDir: string, cfg: Not3Config): void {
 export interface FlagSettings {
   server?: string;
   password?: string;
+  statsPassword?: string;
   mode?: CryptoMode;
   editor?: string;
   outputMode?: OutputModeSetting;
@@ -86,6 +88,7 @@ export interface FlagSettings {
 export interface ResolvedSettings {
   server: string;
   password?: string;
+  statsPassword?: string;
   mode: CryptoMode;
   editor?: string;
   versionCheck: boolean;
@@ -100,10 +103,12 @@ export function resolveSettings(
   const server = normalizeServerUrl(
     flags.server ?? cfg.server ?? DEFAULTS.server,
   );
-  const stored = cfg.servers?.[server]?.password;
+  const stored = cfg.servers?.[server];
+  const password = flags.password ?? stored?.password;
   return {
     server,
-    password: flags.password ?? stored,
+    password,
+    statsPassword: flags.statsPassword ?? stored?.statsPassword ?? password,
     mode: flags.mode ?? cfg.mode ?? DEFAULTS.mode,
     editor: flags.editor ?? cfg.editor,
     versionCheck: flags.noVersionCheck

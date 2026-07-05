@@ -36,11 +36,15 @@ export default class ConfigSet extends BaseCommand {
     }
     const cfg = loadConfig(this.config.configDir);
     switch (key) {
-      case 'password': {
+      case 'password':
+      case 'statsPassword': {
         const server = normalizeServerUrl(
           flags.server ?? cfg.server ?? DEFAULTS.server,
         );
-        cfg.servers = { ...cfg.servers, [server]: { password: args.value } };
+        cfg.servers = {
+          ...cfg.servers,
+          [server]: { ...cfg.servers?.[server], [key]: args.value },
+        };
         break;
       }
       case 'server':
@@ -71,6 +75,7 @@ export default class ConfigSet extends BaseCommand {
         break;
     }
     saveConfig(this.config.configDir, cfg);
-    this.log(`Set ${key}${key === 'password' ? ' (bound to its server)' : ''}`);
+    const bound = key === 'password' || key === 'statsPassword';
+    this.log(`Set ${key}${bound ? ' (bound to its server)' : ''}`);
   }
 }
