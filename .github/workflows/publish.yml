@@ -13,10 +13,10 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '25'
           registry-url: https://registry.npmjs.org
@@ -53,7 +53,7 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
 
       - name: Build and Push Docker Image
-        uses: mr-smithers-excellent/docker-build-push@v6
+        uses: mr-smithers-excellent/docker-build-push@v7
         with:
           tags: latest,${{ github.sha }},${{ github.ref_name }}
           image: cli
