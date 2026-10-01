@@ -12,12 +12,12 @@ export function resolveOutputMode(
 }
 
 export interface ShareInfo {
-  kind: 'note' | 'file';
+  kind: 'note' | 'file' | 'p2p';
   id: string;
   seed: string;
   seedGenerated: boolean;
   url: string;
-  curl: string;
+  curl?: string;
 }
 
 export interface Progress {
@@ -64,13 +64,13 @@ export class Reporter {
         kv('ID', info.id);
         kv('Seed', info.seed);
         kv('URL', info.url);
-        kv('cURL', info.curl);
+        if (info.curl) kv('cURL', info.curl);
         this.out.write('\n');
         break;
       }
       case 'simple':
         this.out.write(
-          `id: ${info.id}\nseed: ${info.seed}\nurl: ${info.url}\ncurl: ${info.curl}\n`,
+          `id: ${info.id}\nseed: ${info.seed}\nurl: ${info.url}\n${info.curl ? `curl: ${info.curl}\n` : ''}`,
         );
         break;
       case 'stdout':

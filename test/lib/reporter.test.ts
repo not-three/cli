@@ -35,6 +35,40 @@ describe('resolveOutputMode', () => {
 });
 
 describe('Reporter.share', () => {
+  const p2p = {
+    kind: 'p2p' as const,
+    id: 'session-1',
+    seed: 'restart-seed',
+    seedGenerated: true,
+    url: 'https://not-th.re/f/session-1#seed',
+  };
+
+  it('pretty mode renders a P2P QR without a curl command', () => {
+    const { out, r } = make('pretty');
+    r.share(p2p);
+    expect(out.data).to.contain(p2p.url);
+    expect(out.data.length).to.be.greaterThan(500);
+    expect(out.data).to.not.contain('cURL');
+  });
+
+  it('simple mode prints the P2P URL and seed without curl', () => {
+    const { out, r } = make('simple');
+    r.share(p2p);
+    expect(out.data).to.contain(`url: ${p2p.url}`);
+    expect(out.data).to.contain('seed: restart-seed');
+    expect(out.data).to.not.contain('curl:');
+  });
+
+  it('stdout and raw modes keep the P2P URL and ID machine readable', () => {
+    const stdout = make('stdout');
+    stdout.r.share(p2p);
+    expect(stdout.out.data).to.equal(p2p.url);
+    expect(stdout.err.data).to.equal('seed: restart-seed\n');
+    const raw = make('raw');
+    raw.r.share(p2p);
+    expect(raw.out.data).to.equal(p2p.id);
+    expect(raw.err.data).to.equal(p2p.seed);
+  });
   it('stdout mode: url only on stdout, generated seed on stderr', () => {
     const { out, err, r } = make('stdout');
     r.share(share);
