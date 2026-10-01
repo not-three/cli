@@ -18,6 +18,7 @@ export default class ConfigList extends BaseCommand {
     if (!flags['show-secrets'] && shown.servers) {
       for (const entry of Object.values(shown.servers)) {
         if (entry.password) entry.password = '••••';
+        if (entry.statsPassword) entry.statsPassword = '••••';
       }
     }
     this.log(JSON.stringify(shown, null, 2));
