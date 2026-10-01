@@ -1,5 +1,5 @@
 import { Args, Flags } from '@oclif/core';
-import { P2PReceiver } from '@not3/sdk';
+import { P2PPeerDisconnectedError, P2PReceiver } from '@not3/sdk';
 import { existsSync, promises as fs, statSync } from 'fs';
 import { BaseCommand } from '../../base.command';
 import { UsageError } from '../../lib/errors';
@@ -103,6 +103,11 @@ export default class P2PReceiveCommand extends BaseCommand {
       )
         reporter.info(
           `Partial file kept. Resume with: not3 p2p receive <new-link> ${outputPath} --resume`,
+        );
+      if (error instanceof P2PPeerDisconnectedError)
+        this.error(
+          'Sender disconnected or cancelled. Retry if they are still sharing the file.',
+          { exit: 1 },
         );
       throw error;
     } finally {

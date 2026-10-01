@@ -85,6 +85,49 @@ describe('resolveSettings', () => {
       'flag',
     );
   });
+  it('resolves the stored statsPassword for the configured server', () => {
+    const withStats = {
+      server: 'https://self.example',
+      servers: {
+        'https://self.example': { password: 'pw1', statsPassword: 'stats1' },
+      },
+    };
+    expect(resolveSettings(withStats, {}).statsPassword).to.equal('stats1');
+  });
+  it('statsPassword falls back to the regular password when unset', () => {
+    expect(resolveSettings(cfg, {}).statsPassword).to.equal('pw1');
+    expect(resolveSettings({}, { password: 'flag' }).statsPassword).to.equal(
+      'flag',
+    );
+  });
+  it('allows a statsPassword without any instance password', () => {
+    const publicWithStats = {
+      server: 'https://self.example',
+      servers: { 'https://self.example': { statsPassword: 'stats1' } },
+    };
+    const s = resolveSettings(publicWithStats, {});
+    expect(s.password).to.equal(undefined);
+    expect(s.statsPassword).to.equal('stats1');
+  });
+  it('flag statsPassword beats stored values', () => {
+    const withStats = {
+      server: 'https://self.example',
+      servers: { 'https://self.example': { statsPassword: 'stats1' } },
+    };
+    expect(
+      resolveSettings(withStats, { statsPassword: 'flag' }).statsPassword,
+    ).to.equal('flag');
+  });
+  it('does NOT leak the stored statsPassword to a different server', () => {
+    const withStats = {
+      server: 'https://self.example',
+      servers: { 'https://self.example': { statsPassword: 'stats1' } },
+    };
+    expect(
+      resolveSettings(withStats, { server: 'https://other.example' })
+        .statsPassword,
+    ).to.equal(undefined);
+  });
   it('noVersionCheck flag wins over config', () => {
     expect(
       resolveSettings({ versionCheck: true }, { noVersionCheck: true })

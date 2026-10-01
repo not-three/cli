@@ -30,12 +30,12 @@ export default class ConfigUnset extends BaseCommand {
       );
     }
     const cfg = loadConfig(this.config.configDir);
-    if (key === 'password') {
+    if (key === 'password' || key === 'statsPassword') {
       const server = normalizeServerUrl(
         flags.server ?? cfg.server ?? DEFAULTS.server,
       );
       if (cfg.servers?.[server]) {
-        delete cfg.servers[server].password;
+        delete cfg.servers[server][key];
         if (Object.keys(cfg.servers[server]).length === 0)
           delete cfg.servers[server];
       }
