@@ -1,5 +1,6 @@
 import { FragmentData, type SetBytesFn } from '@not3/sdk';
 import { existsSync, promises as fs } from 'fs';
+import { basename } from 'path';
 import { normalizeServerUrl } from './config';
 import { UsageError } from './errors';
 
@@ -7,6 +8,14 @@ export interface ParsedP2PLink {
   sessionId: string;
   seed: string;
   server: string | null;
+}
+
+export function safeP2PFileName(name: string): string {
+  const clean = basename(name.replaceAll('\\', '/')).replaceAll(
+    /[^a-zA-Z0-9.-]/g,
+    '_',
+  );
+  return clean && clean !== '.' && clean !== '..' ? clean : 'download.bin';
 }
 
 export function parseP2PLink(link: string): ParsedP2PLink {

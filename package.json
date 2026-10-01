@@ -50,6 +50,9 @@
       },
       "config": {
         "description": "Manage the global not3 config file"
+      },
+      "p2p": {
+        "description": "Live peer-to-peer file transfers"
       }
     }
   },

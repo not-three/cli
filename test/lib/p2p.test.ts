@@ -3,7 +3,11 @@ import { ShareGenerator } from '@not3/sdk';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { makePositionalSink, parseP2PLink } from '../../src/lib/p2p';
+import {
+  makePositionalSink,
+  parseP2PLink,
+  safeP2PFileName,
+} from '../../src/lib/p2p';
 import { UsageError } from '../../src/lib/errors';
 
 const generator = new ShareGenerator({
@@ -79,5 +83,12 @@ describe('makePositionalSink', () => {
     await sink(new Uint8Array([7, 8]).buffer, 1);
     await sink.close();
     expect([...readFileSync(out)]).to.deep.equal([1, 2, 3, 4, 7, 8]);
+  });
+});
+
+describe('safeP2PFileName', () => {
+  it('removes path traversal and unsupported characters', () => {
+    expect(safeP2PFileName('../../bad name.txt')).to.equal('bad_name.txt');
+    expect(safeP2PFileName('..')).to.equal('download.bin');
   });
 });
