@@ -187,6 +187,7 @@ function waitForShare(sender: ChildProcess): Promise<string> {
           wrongSucceeded = true;
         } catch (error) {
           expect((error as Error).message).to.match(/seed|auth|handshake/i);
+          expect((error as { code?: number }).code).to.equal(1);
         }
         expect(wrongSucceeded).to.equal(false);
 

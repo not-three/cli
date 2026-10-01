@@ -8,11 +8,11 @@ import {
   makePositionalSink,
   parseP2PLink,
   safeP2PFileName,
+  transferMiBProgress,
+  validateResumeOffset,
 } from '../../lib/p2p';
 import { Progress } from '../../lib/reporter';
 import { rtcCleanup, rtcFactory } from '../../lib/rtc';
-
-const MIB = 1024 * 1024;
 
 export default class P2PReceiveCommand extends BaseCommand {
   static description =
@@ -64,19 +64,16 @@ export default class P2PReceiveCommand extends BaseCommand {
     let bar: Progress | undefined;
     receiver.onProgress((p) => {
       if (p.state !== 'transfer' && p.state !== 'done') return;
-      bar ??= reporter.progress('Receiving', Math.ceil(p.totalBytes / MIB));
-      bar.update(
-        Math.min(
-          Math.ceil(p.totalBytes / MIB),
-          Math.floor(p.bytesTransferred / MIB),
-        ),
-      );
+      const progress = transferMiBProgress(p.bytesTransferred, p.totalBytes);
+      bar ??= reporter.progress('Receiving', progress.total);
+      bar.update(progress.done);
     });
 
     try {
       await receiver.start(async (buf, index) => {
         if (!sink) {
           const meta = await receiver.getMeta();
+          validateResumeOffset(resumeOffset, meta.size);
           outputPath ??= safeP2PFileName(meta.name);
           if (existsSync(outputPath) && !flags.resume)
             throw new UsageError(
@@ -90,6 +87,7 @@ export default class P2PReceiveCommand extends BaseCommand {
         const meta = await receiver.getMeta();
         outputPath = safeP2PFileName(meta.name);
       }
+      validateResumeOffset(resumeOffset, (await receiver.getMeta()).size);
       if (!existsSync(outputPath)) {
         const empty = await fs.open(outputPath, 'wx');
         await empty.close();
@@ -97,7 +95,12 @@ export default class P2PReceiveCommand extends BaseCommand {
       bar?.finish();
       reporter.info(`Saved to ${outputPath}`);
     } catch (error) {
-      if (outputPath && existsSync(outputPath) && statSync(outputPath).size > 0)
+      if (
+        !(error instanceof UsageError) &&
+        outputPath &&
+        existsSync(outputPath) &&
+        statSync(outputPath).size > 0
+      )
         reporter.info(
           `Partial file kept. Resume with: not3 p2p receive <new-link> ${outputPath} --resume`,
         );

@@ -6,10 +6,9 @@ import { BaseCommand } from '../../base.command';
 import { UsageError } from '../../lib/errors';
 import { seedFlag, serverFlags } from '../../lib/flags';
 import { readFileChunk } from '../../lib/io';
+import { transferMiBProgress } from '../../lib/p2p';
 import { rtcCleanup, rtcFactory } from '../../lib/rtc';
 import { p2pShare } from '../../lib/share';
-
-const MIB = 1024 * 1024;
 
 export default class P2PSendCommand extends BaseCommand {
   static description =
@@ -44,13 +43,16 @@ export default class P2PSendCommand extends BaseCommand {
       const sender = new P2PSender(api.p2p(), fileName, stat.size, {
         seed: flags.seed,
       });
-      const bar = reporter.progress('Sending', Math.ceil(stat.size / MIB));
+      const bar = reporter.progress(
+        'Sending',
+        transferMiBProgress(0, stat.size).total,
+      );
       let shared = false;
       let interrupted = false;
       const onInterrupt = () => {
         if (interrupted) return;
         interrupted = true;
-        void sender.cancel();
+        void sender.cancel().catch(() => {});
       };
       process.once('SIGINT', onInterrupt);
       sender.onProgress((p) => {
@@ -73,12 +75,7 @@ export default class P2PSendCommand extends BaseCommand {
           );
         }
         if (p.state === 'transfer' || p.state === 'done')
-          bar.update(
-            Math.min(
-              Math.ceil(stat.size / MIB),
-              Math.floor(p.bytesTransferred / MIB),
-            ),
-          );
+          bar.update(transferMiBProgress(p.bytesTransferred, stat.size).done);
       });
       try {
         await sender.start((start, end) =>

@@ -7,6 +7,8 @@ import {
   makePositionalSink,
   parseP2PLink,
   safeP2PFileName,
+  transferMiBProgress,
+  validateResumeOffset,
 } from '../../src/lib/p2p';
 import { UsageError } from '../../src/lib/errors';
 
@@ -55,6 +57,15 @@ describe('parseP2PLink', () => {
       /Not a file share link/,
     );
   });
+
+  it('rejects an embedded server with a non-HTTP scheme', () => {
+    const url = new ShareGenerator({
+      uiUrl: 'https://ui.x/',
+      apiUrl: 'ftp://bad.x/',
+      storeServer: true,
+    }).p2pUi('abc', 'k');
+    expect(() => parseP2PLink(url)).to.throw(UsageError);
+  });
 });
 
 describe('makePositionalSink', () => {
@@ -83,6 +94,43 @@ describe('makePositionalSink', () => {
     await sink(new Uint8Array([7, 8]).buffer, 1);
     await sink.close();
     expect([...readFileSync(out)]).to.deep.equal([1, 2, 3, 4, 7, 8]);
+  });
+
+  it('does not overwrite a file created after the sink is prepared', async () => {
+    const out = join(dir, 'out.bin');
+    const sink = makePositionalSink(out, 4);
+    writeFileSync(out, 'existing');
+    try {
+      await sink(new Uint8Array([1, 2, 3, 4]).buffer, 0);
+      throw new Error(
+        'Expected the sink to refuse an unexpected existing file',
+      );
+    } catch (error) {
+      expect((error as NodeJS.ErrnoException).code).to.equal('EEXIST');
+    } finally {
+      await sink.close();
+    }
+    expect(readFileSync(out, 'utf8')).to.equal('existing');
+  });
+});
+
+describe('transferMiBProgress', () => {
+  it('reaches the total when a file ends below a whole MiB', () => {
+    expect(transferMiBProgress(500_000, 500_000)).to.deep.equal({
+      done: 1,
+      total: 1,
+    });
+    expect(transferMiBProgress(1024 * 1024, 1_500_000)).to.deep.equal({
+      done: 1,
+      total: 2,
+    });
+  });
+});
+
+describe('validateResumeOffset', () => {
+  it('rejects a partial output larger than the shared file', () => {
+    expect(() => validateResumeOffset(6, 5)).to.throw(UsageError, /larger/);
+    expect(() => validateResumeOffset(5, 5)).to.not.throw();
   });
 });
 
