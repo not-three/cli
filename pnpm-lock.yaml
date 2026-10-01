@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@not3/sdk':
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.1.1
+        version: 2.1.1
       '@oclif/core':
         specifier: ^4
         version: 4.11.14
@@ -228,8 +228,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@not3/sdk@2.1.0':
-    resolution: {integrity: sha512-V7pPTiJ+rIzZ/1OzcxSJ0rN5+0g+m3AZo+O0Liav+AjMb7Ya2fnMR06ucrwIPucowOuH21BuXNAahf6XFvHWIQ==}
+  '@not3/sdk@2.1.1':
+    resolution: {integrity: sha512-po+u5DGPWWnrnWI8RIZEpcq/mteDMK0LcO+H1I8/urAf4IhfhzeNQ5fW9GZWFUdMyJO7kBpmxFUi55153QoJbQ==}
 
   '@npmcli/agent@4.0.2':
     resolution: {integrity: sha512-EUEuWAxnL07Sp5/iC/1X6Xj+XThUvnbei9zfRWZdEXa7lss9RTHMhAHBeg+MZ5To9s/gGaSI+UwZTPdYMvKSeg==}
@@ -1849,7 +1849,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@not3/sdk@2.1.0':
+  '@not3/sdk@2.1.1':
     dependencies:
       axios: 1.18.1
       semver: 7.8.5
