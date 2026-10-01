@@ -6,7 +6,7 @@ import { join } from 'path';
 import nock from 'nock';
 import not3Sdk from '@not3/sdk';
 
-const { ShareGenerator } = not3Sdk;
+const { P2PPeerDisconnectedError, P2PReceiver, ShareGenerator } = not3Sdk;
 
 const SERVER = 'http://localhost:9999';
 const share = new ShareGenerator({
@@ -106,5 +106,28 @@ describe('not3 p2p receive', () => {
     ]);
     expect(error?.message).to.contain('Output file exists');
     expect((error as { oclif?: { exit?: number } })?.oclif?.exit).to.equal(2);
+  });
+
+  it('reports a sender cancellation without a raw peer disconnect error', async () => {
+    const originalStart = P2PReceiver.prototype.start;
+    P2PReceiver.prototype.start = (async () => {
+      throw new P2PPeerDisconnectedError();
+    }) as typeof originalStart;
+    try {
+      const { error } = await runCommand([
+        'p2p',
+        'receive',
+        share.p2pUi('abc', 'k'),
+        join(dir, 'partial.bin'),
+        '--server',
+        SERVER,
+        '--no-version-check',
+      ]);
+      expect(error?.message).to.contain('Sender disconnected or cancelled');
+      expect(error?.message).to.not.contain('Peer disconnected');
+      expect((error as { oclif?: { exit?: number } })?.oclif?.exit).to.equal(1);
+    } finally {
+      P2PReceiver.prototype.start = originalStart;
+    }
   });
 });
