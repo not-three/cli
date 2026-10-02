@@ -9,7 +9,7 @@
     "not3": "bin/run.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "files": [
     "bin",
@@ -50,6 +50,9 @@
       },
       "config": {
         "description": "Manage the global not3 config file"
+      },
+      "p2p": {
+        "description": "Live peer-to-peer file transfers"
       }
     }
   },
@@ -66,9 +69,10 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@not3/sdk": "^2.0.5",
+    "@not3/sdk": "^2.1.1",
     "@oclif/core": "^4",
     "enquirer": "^2.4.1",
+    "node-datachannel": "^0.33.4",
     "qrcode-terminal": "^0.12.0",
     "yazl": "^3.3.1"
   },

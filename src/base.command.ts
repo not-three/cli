@@ -1,5 +1,5 @@
 import { Command, Flags } from '@oclif/core';
-import { Not3Client } from '@not3/sdk';
+import { Not3Client, P2PError } from '@not3/sdk';
 import { createApi } from './lib/api';
 import {
   CryptoMode,
@@ -73,6 +73,7 @@ export abstract class BaseCommand extends Command {
     if (err instanceof UsageError) this.error(err.message, { exit: 2 });
     if (err instanceof IncompatibleServerError)
       this.error(err.message, { exit: 1 });
+    if (err instanceof P2PError) this.error(err.message, { exit: 1 });
     if (err.isAxiosError) {
       const res = (
         err as unknown as {

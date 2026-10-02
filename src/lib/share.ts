@@ -47,3 +47,13 @@ export function fileShare(opts: {
     curl: gen.fileCurl(opts.id, opts.seed, opts.fileName),
   };
 }
+
+export function p2pShare(opts: {
+  uiUrl: string;
+  apiServer: string;
+  id: string;
+  seed: string;
+}): { url: string } {
+  const { gen } = generator(opts.uiUrl, opts.apiServer);
+  return { url: gen.p2pUi(opts.id, opts.seed) };
+}

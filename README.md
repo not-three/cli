@@ -29,6 +29,8 @@ journalctl -u app | not3 s            # pipe logs, get a share url on stdout
 not3 note get <id>                    # fetch + decrypt (alias: not3 g)
 not3 file upload video.mp4            # upload a file (alias: not3 u)
 not3 file download <id> out.mp4       # download a file (alias: not3 d)
+not3 p2p send video.mp4               # share a live transfer link and QR code
+not3 p2p receive <link> [output]       # receive; use --resume with a partial output
 not3 crypto encrypt -f x.txt -o x.enc # local encryption
 not3 config set server https://my.api # global defaults (~/.config/not3/config.json)
 not3 config set password hunter2      # bound to the server above, never sent elsewhere
@@ -39,3 +41,6 @@ Every flag can also be set via environment variables prefixed with `NOT3_`
 global config file managed by `not3 config`. Output adapts automatically:
 pretty (colors, progress bars, QR codes) on a terminal, machine-readable when
 piped — override with `--output-mode pretty|simple|stdout|raw`.
+
+P2P transfer commands require Node.js 22 or newer. Reuse the printed seed with
+`not3 p2p send <file> --seed <seed>` to restart an interrupted transfer.

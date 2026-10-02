@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { FragmentData } from '@not3/sdk';
-import { fileShare, noteShare } from '../../src/lib/share';
+import { fileShare, noteShare, p2pShare } from '../../src/lib/share';
 
 describe('noteShare', () => {
   it('builds a ui url containing the note id and seed fragment', () => {
@@ -45,6 +45,22 @@ describe('noteShare', () => {
     });
     expect(FragmentData.fromURL(url).server).to.equal('https://other.example/');
     expect(url).to.not.match(/example\/\//);
+  });
+});
+
+describe('p2pShare', () => {
+  it('puts the seed and custom server in the fragment', () => {
+    const url = p2pShare({
+      uiUrl: 'https://not-th.re/',
+      apiServer: 'https://other.example',
+      id: 's1',
+      seed: 'k1',
+    }).url;
+    expect(new URL(url).pathname).to.equal('/f/s1');
+    const fragment = FragmentData.fromURL(url);
+    expect(fragment.seed).to.equal('k1');
+    expect(fragment.server).to.equal('https://other.example/');
+    expect(fragment.p2p).to.equal(true);
   });
 });
 
