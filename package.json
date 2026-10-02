@@ -69,7 +69,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@not3/sdk": "^2.1.1",
+    "@not3/sdk": "^2.3.0",
     "@oclif/core": "^4",
     "enquirer": "^2.4.1",
     "node-datachannel": "^0.33.4",
