@@ -1,6 +1,6 @@
 FROM node:24-alpine
 
-COPY package.json pnpm-lock.yaml /app/
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY bin /app/bin
 COPY dist /app/dist
 WORKDIR /app
