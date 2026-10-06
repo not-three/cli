@@ -97,7 +97,7 @@ describe('Reporter.share', () => {
     const { out, r } = make('simple');
     r.share(share);
     expect(out.data).to.contain('id: abc123');
-    expect(out.data).to.not.match(/\x1b\[/);
+    expect(out.data).to.not.contain('\x1b[');
   });
 });
 

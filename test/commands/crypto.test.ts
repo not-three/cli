@@ -3,9 +3,7 @@ import { expect } from 'chai';
 import { mkdtempSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import not3Sdk from '@not3/sdk';
-
-const { Crypto } = not3Sdk;
+import { Crypto } from '@not3/sdk';
 
 describe('not3 crypto', () => {
   let originalIsTTY: PropertyDescriptor | undefined;

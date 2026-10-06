@@ -1,9 +1,7 @@
 import { runCommand } from '@oclif/test';
 import { expect } from 'chai';
 import nock from 'nock';
-import not3Sdk from '@not3/sdk';
-
-const { Crypto } = not3Sdk;
+import { Crypto } from '@not3/sdk';
 
 const SERVER = 'http://localhost:9999';
 const INFO = {
