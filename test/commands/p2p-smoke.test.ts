@@ -11,9 +11,7 @@ import {
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { promisify } from 'util';
-import not3Sdk from '@not3/sdk';
-
-const { Crypto, FragmentData, ShareGenerator } = not3Sdk;
+import { Crypto, FragmentData, ShareGenerator } from '@not3/sdk';
 
 const SMOKE = process.env.NOT3_SMOKE_SERVER;
 const CLI = join(process.cwd(), 'bin', 'dev.js');

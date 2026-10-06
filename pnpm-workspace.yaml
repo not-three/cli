@@ -2,5 +2,6 @@ minimumReleaseAgeExclude:
   - multer@2.2.0
   - '@not3/sdk@2.3.0'
 overrides:
+  axios: 1.20.0
   multer@>=1.0.0 <2.2.0: ^2.2.0
   multer@>=2.0.0-alpha.1 <2.2.0: ^2.2.0

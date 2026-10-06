@@ -4,9 +4,7 @@ import { mkdirSync, mkdtempSync, readdirSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import nock from 'nock';
-import not3Sdk from '@not3/sdk';
-
-const { Crypto } = not3Sdk;
+import { Crypto } from '@not3/sdk';
 
 const SERVER = 'http://localhost:9999';
 const INFO = {
