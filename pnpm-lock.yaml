@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@not3/sdk':
-        specifier: ^2.3.0
-        version: 2.3.0(supports-color@8.1.1)
+        specifier: ^2.3.1
+        version: 2.3.1
       '@oclif/core':
         specifier: ^5.1.2
         version: 5.1.2
@@ -258,8 +258,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@not3/sdk@2.3.0':
-    resolution: {integrity: sha512-4Eesf92MsKGHOtTVH2RCmPNeGoDbE8lGnNW/dCPaFFJbfSbdDnJEQMZ6vhFtKDRjGB8AcALayubFPBQuhkhjPA==}
+  '@not3/sdk@2.3.1':
+    resolution: {integrity: sha512-Q32BxPPpy6CsG/gtRAaqG2Sj36ATAhp0wjfbAudMHbhnTLbd0DHqTvwHNeP23RAnMvZTh3KrUCEHu82rLMLJsA==}
 
   '@npmcli/agent@5.0.2':
     resolution: {integrity: sha512-EkzGmEsgbQ1rqWkRJe2P0oQHx/ylZozDUNPMXCklLuSFL3GY+QyEfBUjhjCsgGXzh4OGpnHvkboSQgczjP/jJg==}
@@ -1705,9 +1705,9 @@ snapshots:
   '@node-datachannel/win32-x64-msvc@0.33.4':
     optional: true
 
-  '@not3/sdk@2.3.0(supports-color@8.1.1)':
+  '@not3/sdk@2.3.1':
     dependencies:
-      axios: 1.20.0(supports-color@8.1.1)
+      axios: 1.20.0
       semver: 7.8.5
     transitivePeerDependencies:
       - debug
@@ -2064,7 +2064,7 @@ snapshots:
 
   acorn@8.19.0: {}
 
-  agent-base@6.0.2(supports-color@8.1.1):
+  agent-base@6.0.2:
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -2101,11 +2101,11 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.20.0(supports-color@8.1.1):
+  axios@1.20.0:
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.6
-      https-proxy-agent: 5.0.1(supports-color@8.1.1)
+      https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
@@ -2498,9 +2498,9 @@ snapshots:
       - kerberos
       - supports-color
 
-  https-proxy-agent@5.0.1(supports-color@8.1.1):
+  https-proxy-agent@5.0.1:
     dependencies:
-      agent-base: 6.0.2(supports-color@8.1.1)
+      agent-base: 6.0.2
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
