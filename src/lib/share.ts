@@ -1,5 +1,19 @@
-import { FragmentData, ShareGenerator } from '@not3/sdk';
+import { FragmentData, ShareAlternative, ShareGenerator } from '@not3/sdk';
 import { CryptoMode, DEFAULTS, normalizeServerUrl } from './config';
+
+interface ShareResult {
+  url: string;
+  alternatives: ShareAlternative[];
+  curl?: string;
+}
+
+function shareResult(alternatives: ShareAlternative[]): ShareResult {
+  return {
+    url: alternatives[0].value,
+    alternatives,
+    curl: alternatives.find((alternative) => alternative.id === 'curl')?.value,
+  };
+}
 
 function generator(
   uiUrl: string,
@@ -21,17 +35,24 @@ export function noteShare(opts: {
   id: string;
   seed: string;
   mode: CryptoMode;
-}): { url: string; curl: string } {
+  fileName?: string;
+}): ShareResult {
   const { gen, isDefault, server } = generator(opts.uiUrl, opts.apiServer);
   const fragment = new FragmentData({
     seed: opts.seed,
     server: isDefault ? null : server + '/',
     cryptoMode: opts.mode,
   });
-  return {
-    url: gen.noteUi(opts.id, fragment),
-    curl: gen.noteCurl(opts.id, opts.seed),
-  };
+  return shareResult(
+    gen.alternatives({
+      kind: 'note',
+      id: opts.id,
+      seed: opts.seed,
+      cryptoMode: opts.mode,
+      fileName: opts.fileName,
+      fragment,
+    }),
+  );
 }
 
 export function fileShare(opts: {
@@ -40,12 +61,16 @@ export function fileShare(opts: {
   id: string;
   seed: string;
   fileName: string;
-}): { url: string; curl: string } {
+}): ShareResult {
   const { gen } = generator(opts.uiUrl, opts.apiServer);
-  return {
-    url: gen.fileUi(opts.id, opts.seed),
-    curl: gen.fileCurl(opts.id, opts.seed, opts.fileName),
-  };
+  return shareResult(
+    gen.alternatives({
+      kind: 'file',
+      id: opts.id,
+      seed: opts.seed,
+      fileName: opts.fileName,
+    }),
+  );
 }
 
 export function p2pShare(opts: {
@@ -53,7 +78,9 @@ export function p2pShare(opts: {
   apiServer: string;
   id: string;
   seed: string;
-}): { url: string } {
+}): ShareResult {
   const { gen } = generator(opts.uiUrl, opts.apiServer);
-  return { url: gen.p2pUi(opts.id, opts.seed) };
+  return shareResult(
+    gen.alternatives({ kind: 'p2p', id: opts.id, seed: opts.seed }),
+  );
 }

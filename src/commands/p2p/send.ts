@@ -12,7 +12,7 @@ import { p2pShare } from '../../lib/share';
 
 export default class P2PSendCommand extends BaseCommand {
   static description =
-    'Send a file directly to one receiver; reuse --seed to restart an interrupted transfer';
+    'Send a file directly to one receiver and print share alternatives; reuse --seed to restart an interrupted transfer';
   static examples = [
     'not3 p2p send ./video.mp4',
     'not3 p2p send ./video.mp4 --seed <seed-from-previous-attempt>',
@@ -58,17 +58,19 @@ export default class P2PSendCommand extends BaseCommand {
       sender.onProgress((p) => {
         if (p.state === 'waiting-peer' && !shared) {
           shared = true;
+          const share = p2pShare({
+            uiUrl: settings.uiUrl,
+            apiServer: settings.server,
+            id: sender.getSessionId(),
+            seed: sender.getSeed(),
+          });
           reporter.share({
             kind: 'p2p',
             id: sender.getSessionId(),
             seed: sender.getSeed(),
             seedGenerated: !flags.seed,
-            url: p2pShare({
-              uiUrl: settings.uiUrl,
-              apiServer: settings.server,
-              id: sender.getSessionId(),
-              seed: sender.getSeed(),
-            }).url,
+            url: share.url,
+            alternatives: share.alternatives,
           });
           reporter.info(
             'Waiting for a receiver to open the link… (Ctrl+C to cancel)',
