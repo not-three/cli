@@ -1,5 +1,7 @@
 import { expect } from 'chai';
 import { Reporter, resolveOutputMode, ShareInfo } from '../../src/lib/reporter';
+import { ShareAlternative } from '@not3/sdk';
+import { fileShare, noteShare, p2pShare } from '../../src/lib/share';
 
 class Sink {
   data = '';
@@ -22,6 +24,44 @@ const share: ShareInfo = {
   seedGenerated: true,
   url: 'https://not-th.re/abc123#seedX',
   curl: 'curl ...',
+  alternatives: [
+    {
+      id: 'ui',
+      label: 'Link',
+      description: 'Open in browser.',
+      value: 'https://not-th.re/abc123#seedX',
+    },
+    {
+      id: 'cli',
+      label: 'CLI',
+      description: 'Needs CLI.',
+      value: "not3 note get abc123 --seed 'seedX'",
+    },
+    {
+      id: 'docker',
+      label: 'Docker',
+      description: 'Needs Docker.',
+      value: 'docker run ...',
+    },
+    {
+      id: 'curl',
+      label: 'cURL',
+      description: 'Needs curl.',
+      value: 'curl ...',
+    },
+    {
+      id: 'powershell',
+      label: 'PowerShell',
+      description: 'Needs PowerShell.',
+      value: 'powershell ...',
+    },
+    {
+      id: 'server-decrypt',
+      label: 'Server-side decrypt',
+      description: 'Server sees key.',
+      value: 'https://api.not-th.re/decrypt',
+    },
+  ] as ShareAlternative[],
 };
 
 describe('resolveOutputMode', () => {
@@ -41,14 +81,36 @@ describe('Reporter.share', () => {
     seed: 'restart-seed',
     seedGenerated: true,
     url: 'https://not-th.re/f/session-1#seed',
+    alternatives: [
+      {
+        id: 'ui',
+        label: 'Link',
+        description: '',
+        value: 'https://not-th.re/f/session-1#seed',
+      },
+      {
+        id: 'cli',
+        label: 'CLI',
+        description: '',
+        value: 'not3 p2p receive link',
+      },
+      {
+        id: 'docker',
+        label: 'Docker',
+        description: '',
+        value: 'docker run receive',
+      },
+    ] as ShareAlternative[],
   };
 
-  it('pretty mode renders a P2P QR without a curl command', () => {
+  it('pretty mode renders a P2P QR and its available commands', () => {
     const { out, r } = make('pretty');
     r.share(p2p);
     expect(out.data).to.contain(p2p.url);
     expect(out.data.length).to.be.greaterThan(500);
     expect(out.data).to.not.contain('cURL');
+    expect(out.data).to.contain('not3 p2p receive link');
+    expect(out.data).to.contain('docker run receive');
   });
 
   it('simple mode prints the P2P URL and seed without curl', () => {
@@ -98,6 +160,124 @@ describe('Reporter.share', () => {
     r.share(share);
     expect(out.data).to.contain('id: abc123');
     expect(out.data).to.not.contain('\x1b[');
+    expect(out.data).to.equal(
+      "id: abc123\nseed: seedX\nurl: https://not-th.re/abc123#seedX\ncli: not3 note get abc123 --seed 'seedX'\ndocker: docker run ...\ncurl: curl ...\npowershell: powershell ...\nserver: https://api.not-th.re/decrypt\n",
+    );
+  });
+
+  it('pretty mode displays ordered padded labels and exact catalog values', () => {
+    const { out, r } = make('pretty');
+    r.share(share);
+    const lines = out.data
+      .split('\n')
+      .filter((line) => line.includes('\x1b[2m'));
+    expect(lines).to.deep.equal([
+      '  \x1b[2mID    \x1b[0m \x1b[36mabc123\x1b[0m',
+      '  \x1b[2mSeed  \x1b[0m \x1b[36mseedX\x1b[0m',
+      '  \x1b[2mURL   \x1b[0m \x1b[36mhttps://not-th.re/abc123#seedX\x1b[0m',
+      "  \x1b[2mCLI   \x1b[0m \x1b[36mnot3 note get abc123 --seed 'seedX'\x1b[0m",
+      '  \x1b[2mDocker\x1b[0m \x1b[36mdocker run ...\x1b[0m',
+      '  \x1b[2mcURL  \x1b[0m \x1b[36mcurl ...\x1b[0m',
+      '  \x1b[2mPS    \x1b[0m \x1b[36mpowershell ...\x1b[0m',
+      '  \x1b[2mServer\x1b[0m \x1b[36mhttps://api.not-th.re/decrypt\x1b[0m',
+    ]);
+  });
+
+  for (const [kind, result] of [
+    [
+      'note',
+      noteShare({
+        uiUrl: 'https://not-th.re/',
+        apiServer: 'https://api.not-th.re',
+        id: 'n1',
+        seed: 'seedX',
+        mode: 'cbc',
+      }),
+    ],
+    [
+      'file',
+      fileShare({
+        uiUrl: 'https://not-th.re/',
+        apiServer: 'https://api.not-th.re',
+        id: 'f1',
+        seed: 'seedX',
+        fileName: 'a.txt',
+      }),
+    ],
+    [
+      'p2p',
+      p2pShare({
+        uiUrl: 'https://not-th.re/',
+        apiServer: 'https://api.not-th.re',
+        id: 's1',
+        seed: 'seedX',
+      }),
+    ],
+  ] as const) {
+    for (const mode of ['pretty', 'simple'] as const) {
+      it(`${kind} ${mode} prints every SDK alternative in catalog order`, () => {
+        const { out, r } = make(mode);
+        r.share({
+          kind,
+          id: 'id',
+          seed: 'seedX',
+          seedGenerated: false,
+          ...result,
+        });
+        const values = result.alternatives.map((row) => row.value);
+        let last = -1;
+        for (const value of values) {
+          const next = out.data.indexOf(value, last + 1);
+          expect(
+            next,
+            `missing or unordered value: ${value}`,
+          ).to.be.greaterThan(last);
+          last = next;
+        }
+        expect(out.data).to.not.contain('undefined:');
+      });
+    }
+    for (const mode of ['stdout', 'raw'] as const) {
+      for (const seedGenerated of [true, false]) {
+        it(`${kind} ${mode} keeps exact machine bytes with ${seedGenerated ? 'generated' : 'supplied'} seed`, () => {
+          const { out, err, r } = make(mode);
+          r.share({ kind, id: 'id', seed: 'seedX', seedGenerated, ...result });
+          expect(out.data).to.equal(mode === 'stdout' ? result.url : 'id');
+          expect(err.data).to.equal(
+            seedGenerated
+              ? mode === 'stdout'
+                ? 'seed: seedX\n'
+                : 'seedX'
+              : '',
+          );
+        });
+      }
+    }
+  }
+
+  it('GCM notes print only CLI and Docker commands after the URL', () => {
+    const result = noteShare({
+      uiUrl: 'https://not-th.re/',
+      apiServer: 'https://api.not-th.re',
+      id: 'n1',
+      seed: 'seedX',
+      mode: 'gcm',
+    });
+    const { out, r } = make('simple');
+    r.share({
+      kind: 'note',
+      id: 'n1',
+      seed: 'seedX',
+      seedGenerated: false,
+      ...result,
+    });
+    expect(
+      out.data
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => line.split(':')[0]),
+    ).to.deep.equal(['id', 'seed', 'url', 'cli', 'docker']);
+    expect(out.data).to.contain('--mode gcm\n');
   });
 });
 

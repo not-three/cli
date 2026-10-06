@@ -2,6 +2,9 @@ import { runCommand } from '@oclif/test';
 import { expect } from 'chai';
 import nock from 'nock';
 import { Crypto } from '@not3/sdk';
+import { mkdtempSync, rmSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 const SERVER = 'http://localhost:9999';
 const INFO = {
@@ -38,6 +41,41 @@ describe('not3 note', () => {
       delete (process.stdin as unknown as { isTTY?: boolean }).isTTY;
     }
     nock.cleanAll();
+  });
+
+  it('save --file prints save variants from the SDK catalog', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'not3-note-share-'));
+    const file = join(dir, 'message.txt');
+    writeFileSync(file, 'secret');
+    const seed = Crypto.generateSeed();
+    try {
+      nock(SERVER).get('/info').times(2).reply(200, INFO);
+      nock(SERVER)
+        .post('/note/json')
+        .reply(201, { id: 'note-file', cost: 1, deleteToken: 't' });
+      const { stdout, error } = await runCommand([
+        's',
+        '--file',
+        file,
+        '--server',
+        SERVER,
+        '--seed',
+        seed,
+        '--output-mode',
+        'simple',
+      ]);
+      expect(error).to.equal(undefined);
+      expect(stdout).to.contain(
+        `cli: not3 note get note-file --seed '${seed}' --server ${SERVER} --output '${file}'\n`,
+      );
+      expect(stdout).to.contain(
+        `docker: docker run --rm -it -v "$(pwd):/data" ghcr.io/not-three/cli note get note-file --seed '${seed}' --server ${SERVER} --output '${file}'\n`,
+      );
+      expect(stdout).to.contain('powershell: ');
+      expect(stdout).to.contain('server: ');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('save encrypts, posts, and prints a share url (stdout mode)', async () => {
