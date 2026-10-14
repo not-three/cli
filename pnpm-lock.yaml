@@ -15,10 +15,10 @@ importers:
     dependencies:
       '@not3/sdk':
         specifier: 2.4.0
-        version: 2.4.0
+        version: 2.4.0(supports-color@8.1.1)
       '@oclif/core':
         specifier: ^5.1.2
-        version: 5.1.2
+        version: 5.1.7
       enquirer:
         specifier: ^2.4.1
         version: 2.4.1
@@ -37,7 +37,7 @@ importers:
         version: 10.0.1(eslint@10.12.0(supports-color@8.1.1))
       '@oclif/test':
         specifier: ^5.0.1
-        version: 5.0.1(@oclif/core@5.1.2)(supports-color@8.1.1)
+        version: 5.0.1(@oclif/core@5.1.7)(supports-color@8.1.1)
       '@types/chai':
         specifier: ^5
         version: 5.2.3
@@ -319,8 +319,8 @@ packages:
     resolution: {integrity: sha512-leBRl6F5F0TvWut8m1/aZcMTUHi2vXjKeMJ/Ik1lW7Q7Yy16Dhtkklu+cEqQww1p1NeLnUNzV3+uwpzqRcy9vw==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  '@oclif/core@5.1.2':
-    resolution: {integrity: sha512-vgbWWFKjjsf7oAbJONFPnDkVNeqmy70DTBUjsprW/HRiTrXe8sMlFc0ih8GjpU+dn+m6V2ksaZjBV9HgnsmWVg==}
+  '@oclif/core@5.1.7':
+    resolution: {integrity: sha512-70BOI+dbtg3dsk8oevulaIsJLXkQzhjmg9CZQ0sI+uSmBg1iLYqlv/QDAzbtOvLZEVHXXvCyU/5uW9k9VB+ljQ==}
     engines: {node: '>=22.0.0'}
 
   '@oclif/test@5.0.1':
@@ -1705,9 +1705,9 @@ snapshots:
   '@node-datachannel/win32-x64-msvc@0.33.4':
     optional: true
 
-  '@not3/sdk@2.4.0':
+  '@not3/sdk@2.4.0(supports-color@8.1.1)':
     dependencies:
-      axios: 1.20.0
+      axios: 1.20.0(supports-color@8.1.1)
       semver: 7.8.5
     transitivePeerDependencies:
       - debug
@@ -1836,7 +1836,7 @@ snapshots:
       node-gyp: 13.1.0
       proc-log: 7.0.0
 
-  '@oclif/core@5.1.2':
+  '@oclif/core@5.1.7':
     dependencies:
       ansi-escapes: 4.3.2
       ansis: 3.17.0
@@ -1857,9 +1857,9 @@ snapshots:
       wrap-ansi: 7.0.0
       wsl-utils: 0.4.0
 
-  '@oclif/test@5.0.1(@oclif/core@5.1.2)(supports-color@8.1.1)':
+  '@oclif/test@5.0.1(@oclif/core@5.1.7)(supports-color@8.1.1)':
     dependencies:
-      '@oclif/core': 5.1.2
+      '@oclif/core': 5.1.7
       ansis: 3.17.0
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -2064,7 +2064,7 @@ snapshots:
 
   acorn@8.19.0: {}
 
-  agent-base@6.0.2:
+  agent-base@6.0.2(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -2101,11 +2101,11 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.20.0:
+  axios@1.20.0(supports-color@8.1.1):
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.6
-      https-proxy-agent: 5.0.1
+      https-proxy-agent: 5.0.1(supports-color@8.1.1)
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
@@ -2498,9 +2498,9 @@ snapshots:
       - kerberos
       - supports-color
 
-  https-proxy-agent@5.0.1:
+  https-proxy-agent@5.0.1(supports-color@8.1.1):
     dependencies:
-      agent-base: 6.0.2
+      agent-base: 6.0.2(supports-color@8.1.1)
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
