@@ -7,6 +7,7 @@ import nock from 'nock';
 import {
   P2PPeerDisconnectedError,
   P2PReceiver,
+  P2PSender,
   ShareGenerator,
 } from '@not3/sdk';
 
@@ -25,6 +26,56 @@ describe('not3 p2p send', () => {
   afterEach(() => {
     nock.cleanAll();
     rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('prints link, CLI and Docker when the sender reaches waiting-peer', async () => {
+    const input = join(dir, 'send.txt');
+    writeFileSync(input, 'hello');
+    const originalStart = P2PSender.prototype.start;
+    const originalOnProgress = P2PSender.prototype.onProgress;
+    const originalSession = P2PSender.prototype.getSessionId;
+    const originalSeed = P2PSender.prototype.getSeed;
+    let progress: Parameters<P2PSender['onProgress']>[0] = () => {};
+    P2PSender.prototype.onProgress = function (hook) {
+      progress = hook;
+    };
+    P2PSender.prototype.getSessionId = () => 'session-share';
+    P2PSender.prototype.getSeed = () => 'seedX';
+    P2PSender.prototype.start = async () => {
+      await progress({
+        state: 'waiting-peer',
+        bytesTransferred: 0,
+        totalBytes: 5,
+      });
+    };
+    try {
+      nock(SERVER)
+        .get('/info')
+        .reply(200, { version: 'IN-DEV', p2pEnabled: true });
+      const { stdout, error } = await runCommand([
+        'p2p',
+        'send',
+        input,
+        '-s',
+        SERVER,
+        '--seed',
+        'seedX',
+        '--output-mode',
+        'simple',
+        '--no-version-check',
+      ]);
+      expect(error).to.equal(undefined);
+      expect(stdout).to.contain('id: session-share\n');
+      expect(stdout).to.contain('cli: not3 p2p receive ');
+      expect(stdout).to.contain('docker: docker run --rm -it ');
+      expect(stdout).to.not.contain('curl:');
+      expect(stdout).to.not.contain('powershell:');
+    } finally {
+      P2PSender.prototype.start = originalStart;
+      P2PSender.prototype.onProgress = originalOnProgress;
+      P2PSender.prototype.getSessionId = originalSession;
+      P2PSender.prototype.getSeed = originalSeed;
+    }
   });
 
   it('reports disabled P2P on the server with exit 1', async () => {

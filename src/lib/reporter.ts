@@ -1,4 +1,5 @@
 import qrcode from 'qrcode-terminal';
+import { ShareAlternative } from '@not3/sdk';
 import { OutputModeSetting } from './config';
 
 export type OutputMode = 'pretty' | 'simple' | 'stdout' | 'raw';
@@ -18,6 +19,7 @@ export interface ShareInfo {
   seedGenerated: boolean;
   url: string;
   curl?: string;
+  alternatives: ShareAlternative[];
 }
 
 export interface Progress {
@@ -54,23 +56,39 @@ export class Reporter {
   }
 
   share(info: ShareInfo): void {
+    const rows = info.alternatives.filter((row) => row.id !== 'ui');
+    const labels: Record<string, string> = {
+      cli: 'CLI',
+      docker: 'Docker',
+      curl: 'cURL',
+      powershell: 'PS',
+      'server-decrypt': 'Server',
+    };
+    const keys: Record<string, string> = {
+      cli: 'cli',
+      docker: 'docker',
+      curl: 'curl',
+      powershell: 'powershell',
+      'server-decrypt': 'server',
+    };
     switch (this.mode) {
       case 'pretty': {
+        const width = Math.max(5, ...rows.map((row) => labels[row.id].length));
         const kv = (label: string, value: string) =>
           this.out.write(
-            `  ${DIM}${label.padEnd(5)}${RESET} ${CYAN}${value}${RESET}\n`,
+            `  ${DIM}${label.padEnd(width)}${RESET} ${CYAN}${value}${RESET}\n`,
           );
         this.out.write('\n' + renderQr(info.url) + '\n');
         kv('ID', info.id);
         kv('Seed', info.seed);
         kv('URL', info.url);
-        if (info.curl) kv('cURL', info.curl);
+        for (const row of rows) kv(labels[row.id], row.value);
         this.out.write('\n');
         break;
       }
       case 'simple':
         this.out.write(
-          `id: ${info.id}\nseed: ${info.seed}\nurl: ${info.url}\n${info.curl ? `curl: ${info.curl}\n` : ''}`,
+          `id: ${info.id}\nseed: ${info.seed}\nurl: ${info.url}\n${rows.map((row) => `${keys[row.id]}: ${row.value}\n`).join('')}`,
         );
         break;
       case 'stdout':

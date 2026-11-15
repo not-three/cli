@@ -1,6 +1,6 @@
 import { runCommand } from '@oclif/test';
 import { expect } from 'chai';
-import { mkdirSync, mkdtempSync, readdirSync, writeFileSync } from 'fs';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import nock from 'nock';
@@ -25,6 +25,42 @@ const INFO = {
 
 describe('not3 file upload --dir', () => {
   afterEach(() => nock.cleanAll());
+
+  it('prints file alternatives after a successful upload', async () => {
+    const base = mkdtempSync(join(tmpdir(), 'not3-share-file-'));
+    const file = join(base, 'sample.txt');
+    writeFileSync(file, 'hi');
+    const seed = Crypto.generateSeed();
+    try {
+      nock(SERVER).persist().get('/info').reply(200, INFO);
+      nock(SERVER).post('/file/upload').reply(201, { id: 'file-share' });
+      nock(SERVER)
+        .get('/file/upload/file-share')
+        .query(true)
+        .reply(200, { url: `${SERVER}/chunk/share` });
+      nock(SERVER).put('/chunk/share').reply(200, '', { ETag: '"etag-share"' });
+      nock(SERVER).put('/file/upload/file-share').reply(200);
+      const { stdout, error } = await runCommand([
+        'u',
+        file,
+        '-s',
+        SERVER,
+        '--seed',
+        seed,
+        '--output-mode',
+        'simple',
+      ]);
+      expect(error).to.equal(undefined);
+      expect(stdout).to.contain(
+        `cli: not3 file download file-share 'sample.txt' --seed '${seed}' --server ${SERVER}\n`,
+      );
+      expect(stdout).to.contain('docker: docker run --rm -it');
+      expect(stdout).to.contain('curl: curl ');
+      expect(stdout).to.contain('powershell: & ([scriptblock]::Create');
+    } finally {
+      rmSync(base, { recursive: true, force: true });
+    }
+  });
 
   it('rejects --dir when the input is not a directory', async () => {
     const base = mkdtempSync(join(tmpdir(), 'not3-test-'));

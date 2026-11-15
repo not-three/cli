@@ -6,7 +6,8 @@ import { resolveTextInput } from '../../lib/input';
 import { noteShare } from '../../lib/share';
 
 export default class NoteSave extends BaseCommand {
-  static description = 'Encrypt and save a note on the server';
+  static description =
+    'Encrypt and save a note; print available share alternatives';
   static aliases = ['s'];
   static strict = false;
   static args = {
@@ -55,6 +56,7 @@ export default class NoteSave extends BaseCommand {
       id: note.id,
       seed,
       mode: s.mode,
+      fileName: flags.file,
     });
     reporter.share({
       kind: 'note',
@@ -63,6 +65,7 @@ export default class NoteSave extends BaseCommand {
       seedGenerated,
       url: share.url,
       curl: share.curl,
+      alternatives: share.alternatives,
     });
   }
 }

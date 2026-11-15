@@ -11,7 +11,8 @@ import { fileShare } from '../../lib/share';
 import { zipDirectory } from '../../lib/zip';
 
 export default class FileUploadCommand extends BaseCommand {
-  static description = 'Encrypt and upload a file';
+  static description =
+    'Encrypt and upload a file; print available share alternatives';
   static aliases = ['u'];
   static args = {
     input: Args.string({
@@ -96,6 +97,7 @@ export default class FileUploadCommand extends BaseCommand {
         seedGenerated,
         url: share.url,
         curl: share.curl,
+        alternatives: share.alternatives,
       });
     } finally {
       if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
